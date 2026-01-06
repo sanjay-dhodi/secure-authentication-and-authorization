@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
+require("./config/dbConnection");
+const bodyparser = require("body-parser");
 const authRoutes = require("./routes/auth.routes");
-const globalErrorHandler = require("./errors/globalErrorHandaler");
+const globalErrorHandler = require("./middleweres/globalErrorHandaler");
+
+app.use(bodyparser.urlencoded());
+app.use(bodyparser.json());
 
 app.use(authRoutes);
 app.use(globalErrorHandler);
