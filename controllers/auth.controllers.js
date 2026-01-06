@@ -1,7 +1,7 @@
+require("dotenv").config();
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/customError");
 const userModel = require("../models/user.model");
-const { required } = require("zod/mini");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -48,7 +48,6 @@ const login = asyncHandler(async (req, resp) => {
   const accessToken = jwt.sign(
     {
       id: foundUser._id.toString(),
-      name: foundUser.name,
       role: foundUser.role,
     },
     process.env.JWT_SECRET,
@@ -57,6 +56,27 @@ const login = asyncHandler(async (req, resp) => {
       expiresIn: "15m",
     }
   );
+
+  const refreshToken = jwt.sign(
+    {
+      id: foundUser._id.toString(),
+    },
+    process.env.JWT_REFRESH_TOKEN_SECRET,
+    {
+      algorithm: "HS256",
+      expiresIn: "7d",
+    }
+  );
+
+  foundUser.refreshToken = refreshToken;
+  await foundUser.save();
+
+  resp.cookie("refreshToken", refreshToken, {
+    http: true,
+    secure: false,
+    samesite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   resp.status(200).json({ success: true, accessToken });
 });
