@@ -30,7 +30,7 @@ const registerUser = asyncHandler(async (req, resp) => {
 
 // login controller #########################################################################
 
-const loginUser = asyncHandler(async (req, resp) => {
+const login = asyncHandler(async (req, resp) => {
   const foundUser = await userModel.findOne({ email: req.body.email });
 
   if (!foundUser) {
@@ -96,7 +96,7 @@ const refreshToken = asyncHandler(async (req, resp) => {
     },
     function (err, decode) {
       if (err) {
-        throw new AppError("invalide refrsh token", 401);
+        throw new AppError("invalide refresh token", 401);
       }
       return decode;
     }
@@ -146,8 +146,40 @@ const refreshToken = asyncHandler(async (req, resp) => {
   resp.status(200).json({ success: true, accessToken });
 });
 
+// logout controller #######################################################
+
+const logout = asyncHandler(async (req, resp) => {
+  const refreshTokenFromCookie = req.cookies.refreshToken;
+
+  if (refreshTokenFromCookie) {
+    const data = await userModel.findOneAndUpdate(
+      {
+        refreshToken: refreshTokenFromCookie,
+      },
+      {
+        $set: {
+          refreshToken: null,
+        },
+      }
+    );
+  }
+
+  resp.clearCookie("refreshToken", {
+    http: true,
+    secure: false,
+    samesite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  resp.status(200).json({
+    success: true,
+    message: "logout successfull",
+  });
+});
+
 module.exports = {
   registerUser,
-  loginUser,
+  login,
+  logout,
   refreshToken,
 };
