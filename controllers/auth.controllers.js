@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // register user ###################################################################
-const register = asyncHandler(async (req, resp) => {
+const registerUser = asyncHandler(async (req, resp) => {
   const allreadyExist = await userModel.findOne({ email: req.body.email });
 
   if (allreadyExist) {
@@ -30,7 +30,7 @@ const register = asyncHandler(async (req, resp) => {
 
 // login controller #########################################################################
 
-const login = asyncHandler(async (req, resp) => {
+const loginUser = asyncHandler(async (req, resp) => {
   const foundUser = await userModel.findOne({ email: req.body.email });
 
   if (!foundUser) {
@@ -44,7 +44,6 @@ const login = asyncHandler(async (req, resp) => {
   }
 
   //   jwt implementation
-
   const accessToken = jwt.sign(
     {
       id: foundUser._id.toString(),
@@ -52,7 +51,6 @@ const login = asyncHandler(async (req, resp) => {
     },
     process.env.JWT_SECRET,
     {
-      algorithm: "HS256",
       expiresIn: "15m",
     }
   );
@@ -63,11 +61,11 @@ const login = asyncHandler(async (req, resp) => {
     },
     process.env.JWT_REFRESH_TOKEN_SECRET,
     {
-      algorithm: "HS256",
       expiresIn: "7d",
     }
   );
 
+  // store refresh token in the db
   foundUser.refreshToken = refreshToken;
   await foundUser.save();
 
@@ -81,7 +79,75 @@ const login = asyncHandler(async (req, resp) => {
   resp.status(200).json({ success: true, accessToken });
 });
 
+// refreshtoken controller
+
+const refreshToken = asyncHandler(async (req, resp) => {
+  const refreshTokenFromCookie = req.cookies.refreshToken;
+
+  if (!refreshTokenFromCookie) {
+    throw new AppError("refresh token missing ", 401);
+  }
+
+  await jwt.verify(
+    refreshTokenFromCookie,
+    process.env.JWT_REFRESH_TOKEN_SECRET,
+    {
+      algorithms: ["HS256"],
+    },
+    function (err, decode) {
+      if (err) {
+        throw new AppError("invalide refrsh token", 401);
+      }
+      return decode;
+    }
+  );
+
+  const userWithRefreshToken = await userModel.findOne({
+    refreshToken: refreshTokenFromCookie,
+  });
+
+  if (!userWithRefreshToken) {
+    throw new AppError("Invalide refresh Token", 403);
+  }
+
+  // regenerate tokens
+  const accessToken = jwt.sign(
+    {
+      id: userWithRefreshToken._id.toString(),
+      role: userWithRefreshToken.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "15m",
+    }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      id: userWithRefreshToken._id.toString(),
+    },
+    process.env.JWT_REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  // refresh token rotation
+  userWithRefreshToken.refreshToken = refreshToken;
+  await userWithRefreshToken.save();
+
+  resp.cookie("refreshToken", refreshToken, {
+    http: true,
+    secure: false,
+    samesite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  resp.status(200).json({ success: true, accessToken });
+});
+
 module.exports = {
-  register,
-  login,
+  registerUser,
+  loginUser,
+  refreshToken,
 };
