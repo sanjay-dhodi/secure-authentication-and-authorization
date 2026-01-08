@@ -1,4 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/customError");
+const mongoose = require("mongoose");
 const userModel = require("../models/user.model");
 
 // get all User controller #############################################################
@@ -13,7 +15,23 @@ const getAllUser = asyncHandler(async (req, resp) => {
 });
 
 // get single User controller ############################################################
-const getSingleUser = asyncHandler(async (req, resp) => {});
+const getSingleUser = asyncHandler(async (req, resp) => {
+  const userId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid User Id", 400);
+  }
+
+  const foundSingleUser = await userModel
+    .findById(userId)
+    .select("-password -refreshToken");
+
+  if (!foundSingleUser) {
+    throw new AppError("User not found", 404);
+  }
+
+  resp.status(200).json({ success: true, user: foundSingleUser });
+});
 
 // update User controller #################################################################
 const updateUser = asyncHandler(async (req, resp) => {});
