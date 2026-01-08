@@ -88,19 +88,18 @@ const refreshToken = asyncHandler(async (req, resp) => {
     throw new AppError("refresh token missing ", 401);
   }
 
-  await jwt.verify(
-    refreshTokenFromCookie,
-    process.env.JWT_REFRESH_TOKEN_SECRET,
-    {
-      algorithms: ["HS256"],
-    },
-    function (err, decode) {
-      if (err) {
-        throw new AppError("invalid refresh token", 401);
+  let decode;
+  try {
+    decode = jwt.verify(
+      refreshTokenFromCookie,
+      process.env.JWT_REFRESH_TOKEN_SECRET,
+      {
+        algorithms: ["HS256"],
       }
-      return decode;
-    }
-  );
+    );
+  } catch (error) {
+    throw new AppError("Invalid Token", 401);
+  }
 
   const userWithRefreshToken = await userModel.findOne({
     refreshToken: refreshTokenFromCookie,
