@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-// router.get("/api/user/alluser");
-// router.get("/api/user/singleuser/:id");
-// router.put("/api/user/update");
-// router.delete("/api/user/delete");
+const userController = require("../controllers/user.controllers");
+
+router.get("/api/user/alluser", userController.getAllUser);
+router.get("/api/user/singleuser/:id", userController.getSingleUser);
+router.put("/api/user/update", userController.updateUser);
+router.delete("/api/user/delete", userController.deleteUser);
 
 module.exports = router;
