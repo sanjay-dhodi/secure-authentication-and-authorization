@@ -5,7 +5,7 @@ const bodyparser = require("body-parser");
 const cookieparser = require("cookie-parser");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
-const globalErrorHandler = require("./middleweres/globalErrorHandaler");
+const globalErrorHandler = require("./middlewares/globalErrorHandaler");
 
 app.use(bodyparser.urlencoded());
 app.use(cookieparser());
