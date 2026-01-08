@@ -34,7 +34,36 @@ const getSingleUser = asyncHandler(async (req, resp) => {
 });
 
 // update User controller #################################################################
-const updateUser = asyncHandler(async (req, resp) => {});
+const updateUser = asyncHandler(async (req, resp) => {
+  const userId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user id", 400);
+  }
+
+  const updatedUser = await userModel
+    .findByIdAndUpdate(
+      userId,
+      {
+        $set: req.body,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    .select("-password -refreshToken");
+
+  if (!updatedUser) {
+    throw new AppError("User not found", 404);
+  }
+
+  resp.status(200).json({
+    success: true,
+    message: "User Successfully updated",
+    user: updatedUser,
+  });
+});
 
 // delete User controller ###################################################################
 const deleteUser = asyncHandler(async (req, resp) => {});

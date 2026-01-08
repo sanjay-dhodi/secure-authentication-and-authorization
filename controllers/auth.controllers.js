@@ -96,7 +96,7 @@ const refreshToken = asyncHandler(async (req, resp) => {
     },
     function (err, decode) {
       if (err) {
-        throw new AppError("invalide refresh token", 401);
+        throw new AppError("invalid refresh token", 401);
       }
       return decode;
     }
@@ -107,7 +107,7 @@ const refreshToken = asyncHandler(async (req, resp) => {
   });
 
   if (!userWithRefreshToken) {
-    throw new AppError("Invalide refresh Token", 403);
+    throw new AppError("Invalid refresh Token", 403);
   }
 
   // regenerate tokens
