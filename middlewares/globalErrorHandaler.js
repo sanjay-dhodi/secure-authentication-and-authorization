@@ -3,6 +3,7 @@ const globalErrorHandler = (err, req, resp, next) => {
     success: false,
     statusCode: err.statusCode || 500,
     message: err.message || "something wrong",
+    errors: err.errors || undefined,
   });
 };
 
