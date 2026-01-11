@@ -4,8 +4,9 @@ const mongoose = require("mongoose");
 const paramSchema = z.object({
   id: z
     .string()
-    .trim(1)
-    .refine((val) => mongoose.Types.ObjectId.isValid(val)),
+    .trim()
+    .min(1, "No Params")
+    .refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid Params"),
 });
 
 module.exports = { paramSchema };

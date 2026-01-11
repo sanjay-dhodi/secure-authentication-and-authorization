@@ -17,6 +17,7 @@ router.get(
   "/api/user/singleuser/:id",
   authMiddleware,
   authorizeRoles("user", "admin"),
+  validateParams(paramSchema),
   userController.getSingleUser
 );
 
