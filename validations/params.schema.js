@@ -5,8 +5,8 @@ const paramSchema = z.object({
   id: z
     .string()
     .trim()
-    .min(1, "No Params")
-    .refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid Params"),
-});
+    .min(1, " User id required")
+    .refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid User Id"),
+}).strict();
 
 module.exports = { paramSchema };

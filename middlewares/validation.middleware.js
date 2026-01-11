@@ -1,4 +1,3 @@
-const { safeParse } = require("zod");
 const AppError = require("../utils/customError");
 
 const validateBody = (schema) => {
@@ -7,6 +6,23 @@ const validateBody = (schema) => {
 
     if (!result.success) {
       const errors = result.error.issues.map((issue) => {
+        // For invalid req body
+        if (issue.code === "invalid_type") {
+          return {
+            message: "Invalid Body Data",
+          };
+        }
+
+        // For Extra field error in the req body
+        if (issue.code === "unrecognized_keys") {
+          return {
+            field: issue.keys.join(", "),
+            message: "Extra fields are not allowed",
+          };
+        }
+
+        // For general validation error
+
         return {
           field: issue.path.join("."),
           message: issue.message,
