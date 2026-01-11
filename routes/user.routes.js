@@ -10,6 +10,7 @@ const {
 } = require("../middlewares/validation.middleware");
 const { paramSchema } = require("../validations/params.schema");
 const { updateUserSchema } = require("../validations/user.schema");
+const checkOwnership = require("../middlewares/ownership.middleware");
 
 router.get(
   "/api/user/alluser",
@@ -21,6 +22,7 @@ router.get(
   "/api/user/singleuser/:id",
   authMiddleware,
   authorizeRoles("user", "admin"),
+  checkOwnership,
   validateParams(paramSchema),
   userController.getSingleUser
 );
@@ -29,6 +31,7 @@ router.patch(
   "/api/user/update/:id",
   authMiddleware,
   authorizeRoles("user", "admin"),
+  checkOwnership,
   validateParams(paramSchema),
   validateBody(updateUserSchema),
   userController.updateUser

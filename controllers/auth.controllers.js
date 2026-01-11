@@ -34,7 +34,7 @@ const login = asyncHandler(async (req, resp) => {
   const foundUser = await userModel.findOne({ email: req.body.email });
 
   if (!foundUser) {
-    throw new AppError("user not exist", 404);
+    throw new AppError("Invalid User", 404);
   }
 
   const matched = await bcrypt.compare(req.body.password, foundUser.password);
@@ -76,7 +76,9 @@ const login = asyncHandler(async (req, resp) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  resp.status(200).json({ success: true, accessToken });
+  resp
+    .status(200)
+    .json({ success: true, message: "Login successfull", accessToken });
 });
 
 // refreshtoken controller

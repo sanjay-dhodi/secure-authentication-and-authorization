@@ -18,10 +18,6 @@ const getAllUser = asyncHandler(async (req, resp) => {
 const getSingleUser = asyncHandler(async (req, resp) => {
   const userId = req.params.id;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new AppError("Invalid User Id", 400);
-  }
-
   const foundSingleUser = await userModel
     .findById(userId)
     .select("-password -refreshToken");
@@ -36,10 +32,6 @@ const getSingleUser = asyncHandler(async (req, resp) => {
 // update User controller #################################################################
 const updateUser = asyncHandler(async (req, resp) => {
   const userId = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new AppError("Invalid user id", 400);
-  }
 
   const updatedUser = await userModel
     .findByIdAndUpdate(
@@ -68,10 +60,6 @@ const updateUser = asyncHandler(async (req, resp) => {
 // delete User controller ###################################################################
 const deleteUser = asyncHandler(async (req, resp) => {
   const userId = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new AppError("Invalid user id", 400);
-  }
 
   const deletedUser = await userModel
     .findByIdAndDelete(userId)
