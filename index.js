@@ -1,12 +1,21 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 require("./config/dbConnection");
+const cors = require("cors");
 const bodyparser = require("body-parser");
 const cookieparser = require("cookie-parser");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandaler");
 const AppError = require("./utils/customError");
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 
 app.use(bodyparser.urlencoded());
 app.use(cookieparser());
@@ -26,6 +35,8 @@ app.use((req, resp, next) => {
 
 app.use(globalErrorHandler);
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   console.log("server started");
 });
