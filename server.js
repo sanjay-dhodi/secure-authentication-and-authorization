@@ -15,6 +15,11 @@ app.use(bodyparser.json());
 app.use(authRoutes);
 app.use(userRoutes);
 
+// health check route for server health
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
+
 app.use((req, resp, next) => {
   return next(new AppError("URL Not Found", 404));
 });
