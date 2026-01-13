@@ -1,6 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+app.set("trust proxy", 1);
+app.use(helmet());
+
 require("./config/dbConnection");
 const cors = require("cors");
 const bodyparser = require("body-parser");
@@ -9,6 +15,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandaler");
 const AppError = require("./utils/customError");
+const authRateLimiter = require("./middlewares/rateLimiterMiddleware");
 
 app.use(
   cors({
@@ -18,10 +25,10 @@ app.use(
 );
 
 app.use(bodyparser.urlencoded());
-app.use(cookieparser());
 app.use(bodyparser.json());
+app.use(cookieparser());
 
-app.use(authRoutes);
+app.use(authRateLimiter, authRoutes);
 app.use(userRoutes);
 
 // health check route for server health
