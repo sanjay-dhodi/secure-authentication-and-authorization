@@ -69,12 +69,10 @@ const login = asyncHandler(async (req, resp) => {
   foundUser.refreshToken = refreshToken;
   await foundUser.save();
 
-  const isProduction = process.env.NODE_ENV === "production";
-
   resp.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -139,12 +137,10 @@ const refreshToken = asyncHandler(async (req, resp) => {
   userWithRefreshToken.refreshToken = refreshToken;
   await userWithRefreshToken.save();
 
-  const isProduction = process.env.NODE_ENV === "production";
-
   resp.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -169,12 +165,10 @@ const logout = asyncHandler(async (req, resp) => {
     );
   }
 
-  const isProduction = process.env.NODE_ENV === "production";
-
   resp.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
