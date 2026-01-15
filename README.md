@@ -47,8 +47,44 @@ Authentication → Role Check → Ownership Check → Validation → Controller
 ## 📂 Project Status
 Completed (learning project).
 
-## Live Endpoint :
+## 📡 API Access
+
+### 🌐 Base URL
 https://secure-authentication-and-authorization.onrender.com
+
+### ❤️ Health Check
+GET /health
+
+### 🔐 Authentication Endpoints
+
+POST /api/auth/register 
+
+**Body Format**
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+POST /api/auth/login  
+
+{  "email": "john@example.com","password": "password123"}
+
+
+POST /api/auth/logout  
+POST /api/auth/refresh  
+
+### 👤 User Endpoints
+GET /api/user/alluser  
+GET /api/user/singleuser/:id  
+PATCH /api/user/update/:id  
+DELETE /api/user/delete/:id  
+
+⚠️ Note:  
+This API uses **HttpOnly cookies** for authentication.  
+Protected routes require login and can be tested using **Postman**  
+
 
 ## 🙌 Author
 **Sanjay Dhodi**  
